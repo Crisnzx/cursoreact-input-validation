@@ -1,17 +1,19 @@
 import { useState } from 'react';
 
-export default function useInput(validateValue) {
+export default function useMyInput(validateInput) {
   const [enteredValue, setEnteredValue] = useState('');
   const [isTouched, setIsTouched] = useState(false);
 
-  const valueIsValid = validateValue(enteredValue);
+  const valueIsValid = validateInput(enteredValue);
   const hasError = isTouched && !valueIsValid;
 
   function valueChangeHandler(e) {
+    // console.log(e.nativeEvent.inputType === 'deleteContentBackward');
+    setIsTouched(false);
     setEnteredValue(e.target.value);
   }
 
-  function inputBlurHandler() {
+  function userTouchedHandler() {
     setIsTouched(true);
   }
 
@@ -25,7 +27,7 @@ export default function useInput(validateValue) {
     isValid: valueIsValid,
     hasError,
     valueChangeHandler,
-    inputBlurHandler,
+    userTouchedHandler,
     reset,
   };
 }

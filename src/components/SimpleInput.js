@@ -1,71 +1,74 @@
-import { useState } from 'react';
 import ErrorMsg from './ErrorMsg';
 
+import useInput from '../hooks/useInput';
+
 const SimpleInput = props => {
-  const [enteredName, setEnteredName] = useState('');
-  const [enteredNameTouched, setEnteredNameTouched] = useState(false);
+  const {
+    value: enteredName,
+    isValid: enteredNameIsValid,
+    hasError: nameHasError,
+    valueChangeHandler: nameChangeHandler,
+    inputBlurHandler: nameBlurHandler,
+    reset: resetNameInput,
+  } = useInput(enteredName => enteredName.trim() !== '');
 
-  const enteredNameIsValid = enteredName.trim() !== '';
-  const inputNameIsInvalid = enteredNameTouched && !enteredNameIsValid;
+  const {
+    value: enteredEmail,
+    isValid: enteredEmailIsValid,
+    hasError: emailHasError,
+    valueChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+    reset: resetEmailInput,
+  } = useInput(validateEmail);
 
-  const [enteredEmail, setEnteredEmail] = useState('');
-  const [enteredEmailTouched, setEnteredEmailTouched] = useState(false);
-
-  const emailRegex = /^[a-zA-Z0-9_\-\.]+@[a-z]+\.[a-zA-Z]{2,5}$/;
-  const enteredEmailIsValid = emailRegex.test(enteredEmail);
-  const inputEmailIsInvalid = enteredEmailTouched && !enteredEmailIsValid;
+  function validateEmail(enteredEmail) {
+    const emailRegex = /^[a-zA-Z0-9_\-.]+@[a-z]+\.[a-zA-Z]{2,5}$/;
+    return emailRegex.test(enteredEmail);
+  }
 
   const formIsValid = enteredNameIsValid && enteredEmailIsValid;
 
   function submitFormHandler(e) {
     e.preventDefault();
-    setEnteredNameTouched(true);
-    setEnteredEmailTouched(true);
+    // If I remove the disabled button logic, these 2 lines will be required, so I have to think in a way to fix it
+    // setEnteredNameTouched(true);
+    // setEnteredEmailTouched(true);
 
     if (!formIsValid) {
+      // Display some error
       return;
     }
 
     console.log(enteredName);
     console.log(enteredEmail);
-    setEnteredName('');
-    setEnteredEmail('');
-    setEnteredNameTouched(false);
-    setEnteredEmailTouched(false);
+    resetNameInput();
+    resetEmailInput();
   }
 
   return (
     <form onSubmit={submitFormHandler}>
-      <div className={`form-control ${inputNameIsInvalid && 'invalid'}`}>
+      <div className={`form-control ${nameHasError && 'invalid'}`}>
         <label htmlFor="name">Your Name</label>
         <input
           type="text"
           id="name"
-          onBlur={e => {
-            setEnteredNameTouched(true);
-          }}
-          onChange={e => {
-            setEnteredName(e.target.value);
-          }}
+          onBlur={nameBlurHandler}
+          onChange={nameChangeHandler}
           value={enteredName}
         />
-        {inputNameIsInvalid && <ErrorMsg>Name must not be empty.</ErrorMsg>}
+        {nameHasError && <ErrorMsg>Name must not be empty.</ErrorMsg>}
       </div>
 
-      <div className={`form-control ${inputEmailIsInvalid && 'invalid'}`}>
+      <div className={`form-control ${emailHasError && 'invalid'}`}>
         <label htmlFor="email">Your Email</label>
         <input
           type="email"
           id="email"
-          onBlur={e => {
-            setEnteredEmailTouched(true);
-          }}
-          onChange={e => {
-            setEnteredEmail(e.target.value);
-          }}
+          onBlur={emailBlurHandler}
+          onChange={emailChangeHandler}
           value={enteredEmail}
         />
-        {inputEmailIsInvalid && <ErrorMsg>Email must be valid.</ErrorMsg>}
+        {emailHasError && <ErrorMsg>Email must be valid.</ErrorMsg>}
       </div>
       <div className="form-actions">
         <button disabled={!formIsValid} type="submit">
