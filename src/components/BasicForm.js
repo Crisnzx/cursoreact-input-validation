@@ -1,4 +1,5 @@
-import useMyInput from '../hooks/useMyInput';
+import useInput from '../hooks/useInput';
+import ErrorMsg from './ErrorMsg';
 
 function validateName(enteredName) {
   return enteredName.trim() !== '';
@@ -17,7 +18,7 @@ const BasicForm = props => {
     valueChangeHandler: firstNameChangeHandler,
     userTouchedHandler: firstNameTouchedHandler,
     reset: resetFirstName,
-  } = useMyInput(validateName);
+  } = useInput(validateName);
 
   const {
     value: enteredLastName,
@@ -26,7 +27,7 @@ const BasicForm = props => {
     valueChangeHandler: lastNameChangeHandler,
     userTouchedHandler: lastNameTouchedHandler,
     reset: resetLastName,
-  } = useMyInput(validateName);
+  } = useInput(validateName);
 
   const {
     value: enteredEmail,
@@ -35,7 +36,7 @@ const BasicForm = props => {
     valueChangeHandler: emailChangeHandler,
     userTouchedHandler: emailTouchedHandler,
     reset: resetEmail,
-  } = useMyInput(validateEmail);
+  } = useInput(validateEmail);
 
   const formIsValid = firstNameIsValid && lastNameIsValid && emailIsValid;
 
@@ -43,6 +44,7 @@ const BasicForm = props => {
     e.preventDefault();
 
     if (!formIsValid) {
+      // Display some error
       firstNameTouchedHandler();
       lastNameTouchedHandler();
       emailTouchedHandler();
@@ -68,9 +70,7 @@ const BasicForm = props => {
             onBlur={firstNameTouchedHandler}
             value={enteredFirstName}
           />
-          {firstNameHasError && (
-            <p className="error-text">First name must be valid.</p>
-          )}
+          {firstNameHasError && <ErrorMsg>First name must be valid.</ErrorMsg>}
         </div>
         <div className={`form-control ${lastNameHasError && 'invalid'}`}>
           <label htmlFor="last-name">Last Name</label>
@@ -81,9 +81,7 @@ const BasicForm = props => {
             onBlur={lastNameTouchedHandler}
             value={enteredLastName}
           />
-          {lastNameHasError && (
-            <p className="error-text">Last name must be valid.</p>
-          )}
+          {lastNameHasError && <ErrorMsg>Last name must be valid.</ErrorMsg>}
         </div>
       </div>
       <div className={`form-control ${emailHasError && 'invalid'}`}>
@@ -95,7 +93,7 @@ const BasicForm = props => {
           onBlur={emailTouchedHandler}
           value={enteredEmail}
         />
-        {emailHasError && <p className="error-text">Email must be valid.</p>}
+        {emailHasError && <ErrorMsg>Email must be valid.</ErrorMsg>}
       </div>
       <div className="form-actions">
         {/* We can disable the submit button using the "disabled" attribute */}
